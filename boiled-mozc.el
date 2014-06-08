@@ -116,6 +116,19 @@ special conversion rules, for example, 'z/' -> '・'."
   :type 'boolean
   :group 'boiled-mozc)
 
+(defcustom boiled-mozc-extensible-preedit nil
+  "Allow characters to be appended to preedit.
+
+This variable determines what to do with a non-control character
+input during preedit.
+
+If non-nil, Mozc is kept active with the character appended to the
+current preedit, thus allowing the predit to be extended beyond its
+original span.  If nil, typing a non-control character immediately
+fixates the preedit and turns Mozc off."
+  :type 'boolean
+  :group 'boiled-mozc)
+
 
 ;;;; Internal variables.
 
@@ -210,7 +223,9 @@ boiled-mozc."
 	    (message "[boiled-mozc-handle-event] prev:<%s> str:<%s>"
 		     prev-preedit str))
 	(when (and (> (length str) 0)
-		   (string= prev-preedit str))
+		   (if boiled-mozc-extensible-preedit
+		       (string= prev-preedit str)
+		     prev-preedit))
 	  ;; Conversion completed
 	  (mozc-clean-up-changes-on-buffer)
 	  (when boiled-mozc-preedit
